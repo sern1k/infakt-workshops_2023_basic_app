@@ -30,29 +30,10 @@ File unchanged! The supplied flag value not found!  app/javascript/application.j
 4. Restartujemuy serwer aplikacji.
 5. Aby mieć pewność, że nic na tym etapie nie przestało działać, wchodzimy do aplikacji i sprawdzamy czy ładuje się lista książek.
 6. Potrzebujemy zrobić mały refactor, aby łatwiej nam było pracować w dalszej części więc dodajemy nowy plik (partial) `app/views/books/_index_item.html.erb`.
-7. Do nowego partiala przenosimy z pliku: `app/views/books/index.html.erb` linie:
-```
-<div class="col-md-6">
-  <div class="book">
-    <h2 class="book-title"><%= book.title %></h2>
-    <div class="book-details">by <%= book.author.full_name %></div>
-    <div class="book-details">Published in <%= book.year %></div>
-    <div class="book-category">Category: <%= book.category.name %></div>
-    <div class="book-btns">
-      <%= link_to 'Details', book_path(book), class: "btn book-btn btn-details" %>
-      <%= reserve_book_button(book, css_class: 'book-btn btn-reserve') %>
-      <%= loan_book_button(book, css_class: 'book-btn btn-reserve') %>
-    </div>
-  </div>
-</div>
-```
+7. Do nowego partiala przenosimy z pliku: `app/views/books/index.html.erb` div `<div class="col-md-6">` wraz z zawartością:
 8. A w pliku, z którego te dane przenieśmy zamiast przeniesionego kodu, dodajemy odwołanie do partiala `<%= render 'index_item', book: book %>`.
 9. Czas na kolejny check, czy aplikacja działa poprawnie i wyświetla się lista z książkami.
 10. Teraz zaczynamy przygotowania pod uruchomienie nowej funkcjonalności, więc w pliku `app/views/books/_index_item.html.erb` dodajemy ID `id="<%= dom_id book %>"` do pierwszego div'a:
-```
-<div class="col-md-6" id="<%= dom_id book %>">
-```
-
 11. Do modelu `app/models/book.rb` dodajemy: `after_destroy_commit -> { broadcast_remove_to :books }`, na przykład po walidacjach i przed deklaracją metod.
 12. Restartujemy server.
 13. I wracamy do pliku `app/views/books/index.html.erb` dodając deklarację `<%= turbo_stream_from :books %>` (na początku pliku).
@@ -94,14 +75,6 @@ A następnie zmienimy paginację, w doczytywaną automatycznie listę.
 11. Aby było łatwiej wprowadzać kolejne zmiany, zmieńmy sposób renderowania elementów z użycia pętli na coś co nam Railsy podrzucają `<%= render partial: 'index_item', collection: @books, as: :book %>` (to było zadanie dodatkowe we wcześniejszym temacie, jeśli to masz zrobione zapraszam dalej).
 12. Kolejny check - sprawdzamy czy aplikacja działa poprawnie i wyświetla się lista z książkami tym razem bez linków do kolejnych stron.
 13. Powyżej div'a `<div class="row">` dodajemy turbo_frame_tag `<%= turbo_frame_tag "paginate_page_#{@books.current_page}" do %>` i kończymy `<% end %>` po zamknięciu div'a:
-```
-<%= turbo_frame_tag "paginate_page_#{@books.current_page}" do %>
-  <div class="row">
-    <%= render partial: 'index_item', collection: @books, as: :book %>
-  </div>
-<% end %>
-```
-
 14. Sprawdzamy jak strona wygląda i działa, czy nam czegoś nie brakuje? Tak, nic się nie dzieje jak zjedziemy na dół strony, naprawmy to :)
 15. Przed zamkniąciem metody turbo_frame_tag, po renderowaniui partiala dodajemy taki oto wpis:
 ```
@@ -112,30 +85,11 @@ A następnie zmienimy paginację, w doczytywaną automatycznie listę.
 <% end %>
 ```
 
-16. Cały widok index wygląda następująco:
-```
-<%= turbo_stream_from :books %>
-
-<div class="container">
-  <h1 class="text-center mb-5">Books</h1>
-  <%= turbo_frame_tag "paginate_page_#{@books.current_page}" do %>
-    <div class="row">
-      <%= render partial: 'index_item', collection: @books, as: :book %>
-    </div>
-    <% if @books.next_page %>
-      <%= turbo_frame_tag "paginate_page_#{@books.next_page}", src: books_path(page: @books.next_page), loading: 'lazy' do %>
-        Loading...
-      <% end %>
-    <% end %>
-  <% end %>
-</div>
-```
-
-17. Sprawdźmy czy wszystko działa teraz jak należy?
-18. Wszystko powyżej działa w taki sposób, że po zejściu na dół strony, pojawia się na moment `loading...` a następnie turbo pobiera z adresu, który przekazaliśmy jako `src` nowe dane i umieszcza je na stronie. Robi to aż do momentu jak występuje kolejny numer strony (if dotyczący next_page).
-19. Mamy to! Strona działa jak zaplanowaliśmy, ale czy na pewno? Sprawdźmy czy można wejść na detal.
-20. Aby naprawić działanie linków musimy dodać deklaracje `data: { turbo: false }` do metod link_to, button_to.
-21. Teraz wszystko działa, brawo!
+16. Sprawdźmy czy wszystko działa teraz jak należy?
+17. Wszystko powyżej działa w taki sposób, że po zejściu na dół strony, pojawia się na moment `loading...` a następnie turbo pobiera z adresu, który przekazaliśmy jako `src` nowe dane i umieszcza je na stronie. Robi to aż do momentu jak występuje kolejny numer strony (if dotyczący next_page).
+18. Mamy to! Strona działa jak zaplanowaliśmy, ale czy na pewno? Sprawdźmy czy można wejść na detal.
+19. Aby naprawić działanie linków musimy dodać deklaracje `data: { turbo: false }` do metod link_to, button_to.
+20. Teraz wszystko działa, brawo!
 
 
 ## Zadanie dodatkowe dla chętnych:
@@ -202,48 +156,20 @@ const value = this.paramsTarget.value
 12. Następnie tę wartość chcemy użyć do zapytania, aby pobrać dane z 'backendu' Rails, w naszym przypadku controllera books_controller.rb:
 ```
 fetch(`/books/search?search=${value}`, {
-  contentType: 'application/json',
-  hearders: 'application/json'
+  headers: {
+    "Content-Type": "application/json",
+  }
 })
 .then((response) => response.text())
 .then(res => {
 })
 ```
 
-13. Cały plik kontrolera js ma postać:
+13. Sprawdzamy czy działa i .... nie działa a w konsoli serwera widzimy blędy. Czegoś nam brakuje.
+14. Mamy zmiany na widoku, mamy kontroler js wysyłający zapytania, ale nie mamy 'backendu', który by to zapytanie mógł obsłużyć.
+15. W `config/routes.rb` brakuje nam routingu obsługującego path: `/books/search` (metoda GET), dodajmy ją.
+16. W w `app/controllers/books_controller.rb` brakuje nam metody `search`, dodajmy ją też:
 ```
-import { Controller } from "@hotwired/stimulus"
-
-// Connects to data-controller="search"
-export default class extends Controller {
-  static targets = ["params"]
-
-  search() {
-    const value = this.paramsTarget.value
-
-    fetch(`/books/search?search=${value}`, {
-      contentType: 'application/json',
-      hearders: 'application/json'
-    })
-    .then((response) => response.text())
-    .then(res => {
-    })
-  }
-}
-```
-
-14. Sprawdzamy czy działa i .... nie działa a w konsoli serwera widzimy blędy. Czegoś nam brakuje.
-15. Mamy zmiany na widoku, mamy kontroler js wysyłający zapytania, ale nie mamy 'backendu', który by to zapytanie mógł obsłużyć.
-16. W `config/routes.rb` brakuje nam routingu obsługującego path: `/books/search` (metoda GET) i w `app/controllers/books_controller.rb` brakuje nam metody `search`, dodajmy je:
-```
-# config/routes.rb - resources :books zastępujemy:
-resources :books do
-  collection do
-    get 'search'
-  end
-end
-
-# app/controllers/books_controller.rb dodajemy metodę search
 def search
   @books = Book.where("title LIKE ?", "%#{params[:search]}%")
   respond_to do |format|
