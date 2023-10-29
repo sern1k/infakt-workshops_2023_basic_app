@@ -64,19 +64,20 @@ A następnie zmienimy paginację, w doczytywaną automatycznie listę.
 1. Dodajemy gem `kaminari` (plik Gemfile).
 2. Uruchamiamy `bundle`, aby nowy gem został zainstalowany.
 3. Następnie za pomocą polecenia `bundle exec rails g kaminari:config` dodajemy wymagane elementy konfiguracyjne.
-4. Restartujemuy serwer aplikacji.
-5. Dodajemy kilka książek tak aby było wszystkich więcej niż 25, warto użyć narzędzia `Faker`, używaliśmy go w seedach.
-6. W kontrolerze `app/controllers/books_controller.rb` zmieniamy wywołanie `Book.all` na `Book.page(params[:page])`
-7. Aby mieć pewność, że nic na tym etapie nie przestało działać, wchodzimy do aplikacji i sprawdzamy czy ładuje się lista książek, ale widzimy tylko 25 rekordów - to dobrze, tak powinno być na tym etapie.
-8. Dodajemy na widoku `app/views/books/index.html.erb` wpis `<div class="row"><%= paginate @books %></div>` wpis umieszczamy po zakończneiu each'a / renderowania kolekcji książek.
-8. Czas na kolejny check, czy aplikacja działa poprawnie i wyświetla się lista z książkami wraz z linkami do kolejnych stron.
-9. W tym momencie mamy wdrożoną paginację w naszej aplikacji na liście książek, brawo!
-10. Na widoku `app/views/books/index.html.erb` usuwamy dodaną przed chwilą paginację - nie będzie nam już potrzebna (`<div class="row"><%= paginate @books %></div>`)
-11. Aby było łatwiej wprowadzać kolejne zmiany, zmieńmy sposób renderowania elementów z użycia pętli na coś co nam Railsy podrzucają `<%= render partial: 'index_item', collection: @books, as: :book %>` (to było zadanie dodatkowe we wcześniejszym temacie, jeśli to masz zrobione zapraszam dalej).
-12. Kolejny check - sprawdzamy czy aplikacja działa poprawnie i wyświetla się lista z książkami tym razem bez linków do kolejnych stron.
-13. Powyżej div'a `<div class="row">` dodajemy turbo_frame_tag `<%= turbo_frame_tag "paginate_page_#{@books.current_page}" do %>` i kończymy `<% end %>` po zamknięciu div'a:
-14. Sprawdzamy jak strona wygląda i działa, czy nam czegoś nie brakuje? Tak, nic się nie dzieje jak zjedziemy na dół strony, naprawmy to :)
-15. Przed zamkniąciem metody turbo_frame_tag, po renderowaniui partiala dodajemy taki oto wpis:
+4. W pliku `config/initializers/kaminari_config.rb` odkomentowujemy ustawienie `default_per_page` i zmieniamy na wartość 6.
+5. Restartujemuy serwer aplikacji.
+6. Dodajemy kilka/kilkanaście książek tak aby było wszystkich więcej niż 25, warto użyć narzędzia `Faker`, używaliśmy go w seedach.
+7. W kontrolerze `app/controllers/books_controller.rb` zmieniamy wywołanie `Book.all` na `Book.page(params[:page])`
+8. Aby mieć pewność, że nic na tym etapie nie przestało działać, wchodzimy do aplikacji i sprawdzamy czy ładuje się lista książek, ale widzimy tylko 25 rekordów - to dobrze, tak powinno być na tym etapie.
+9. Dodajemy na widoku `app/views/books/index.html.erb` wpis `<div class="row"><%= paginate @books %></div>` wpis umieszczamy po zakończneiu each'a / renderowania kolekcji książek.
+10. Czas na kolejny check, czy aplikacja działa poprawnie i wyświetla się lista z książkami wraz z linkami do kolejnych stron.
+11. W tym momencie mamy wdrożoną paginację w naszej aplikacji na liście książek, brawo!
+12. Na widoku `app/views/books/index.html.erb` usuwamy dodaną przed chwilą paginację - nie będzie nam już potrzebna (`<div class="row"><%= paginate @books %></div>`)
+13. Aby było łatwiej wprowadzać kolejne zmiany, zmieńmy sposób renderowania elementów z użycia pętli na coś co nam Railsy podrzucają `<%= render partial: 'index_item', collection: @books, as: :book %>` (to było zadanie dodatkowe we wcześniejszym temacie, jeśli to masz zrobione zapraszam dalej).
+14. Kolejny check - sprawdzamy czy aplikacja działa poprawnie i wyświetla się lista z książkami tym razem bez linków do kolejnych stron.
+15. Powyżej div'a `<div class="row">` dodajemy turbo_frame_tag `<%= turbo_frame_tag "paginate_page_#{@books.current_page}" do %>` i kończymy `<% end %>` po zamknięciu div'a.
+16. Sprawdzamy jak strona wygląda i działa, czy nam czegoś nie brakuje? Tak, nic się nie dzieje jak zjedziemy na dół strony, naprawmy to :)
+17. Przed zamkniąciem metody turbo_frame_tag, po renderowaniui partiala dodajemy taki oto wpis:
 ```
 <% if @books.next_page %>
   <%= turbo_frame_tag "paginate_page_#{@books.next_page}", src: books_path(page: @books.next_page), loading: 'lazy' do %>
@@ -85,16 +86,16 @@ A następnie zmienimy paginację, w doczytywaną automatycznie listę.
 <% end %>
 ```
 
-16. Sprawdźmy czy wszystko działa teraz jak należy?
-17. Wszystko powyżej działa w taki sposób, że po zejściu na dół strony, pojawia się na moment `loading...` a następnie turbo pobiera z adresu, który przekazaliśmy jako `src` nowe dane i umieszcza je na stronie. Robi to aż do momentu jak występuje kolejny numer strony (if dotyczący next_page).
-18. Mamy to! Strona działa jak zaplanowaliśmy, ale czy na pewno? Sprawdźmy czy można wejść na detal.
-19. Aby naprawić działanie linków musimy dodać deklaracje `data: { turbo: false }` do metod link_to, button_to.
-20. Teraz wszystko działa, brawo!
+18. Sprawdźmy czy wszystko działa teraz jak należy?
+19. Wszystko powyżej działa w taki sposób, że po zejściu na dół strony, pojawia się na moment `loading...` a następnie turbo pobiera z adresu, który przekazaliśmy jako `src` nowe dane i umieszcza je na stronie. Robi to aż do momentu jak występuje kolejny numer strony (if dotyczący next_page).
+20. Mamy to! Strona działa jak zaplanowaliśmy, ale czy na pewno? Sprawdźmy czy można wejść na detal.
+21. Aby naprawić działanie linków musimy dodać deklaracje `data: { turbo_frame: '_top' }` do metod link_to, button_to.
+22. Teraz wszystko działa, brawo!
+23. Na [stronie](https://turbo.hotwired.dev/reference/frames) możecie przeczytać czemu z parametrem '_top' linki działają.
 
 
 ## Zadanie dodatkowe dla chętnych:
-1. Jak możemy zrobić, aby na stronie wyświetlała się domyślnie parzysta liczba książek, na przykład 10?
-2. Dodajmy do widoku kafelka ID książki (book.id) tuż obok tytułu książki: `Tytuł książki (id obiketu book)`.
+1. Otwórzcie konsolę przeglądarki (narzędzie developerskie), przejdźcie do zakładki 'Network'. Gdy scrollujecie stronę powinny być widoczen zapytania wysyłane do serwera.
 
 
 
@@ -125,18 +126,18 @@ import SearchController from "./search_controller"
 application.register("search", SearchController)
 ```
 
-5. Mamy obecnie controller.js musimy go połączyć z elementem naszej strony, więc dodajmy do naszej strony pole typu input, w którym uzytkownik będzie mógł wpisać frazę do wyszukiwania.
+5. Mamy obecnie search_controller.js musimy go połączyć z elementem naszej strony, więc dodajmy do naszej strony pole typu input, w którym uzytkownik będzie mógł wpisać frazę do wyszukiwania.
 6. Przechodzimy do `app/views/books/index.html.erb` i pod nagłówkiem h1 dodajemy nowy div z inputem:
 ```
   <div class='text-center mb-5' data-controller='search'>
-    <%= text_field_tag :query,'', placeholder: 'Search by title', data: { action: 'input->search#search', target: 'search.params' } %>
+    <%= text_field_tag :query,'', placeholder: 'Search by title', data: { action: 'input->search#connect', search_target: :params } %>
   </div>
 ```
 Co jest tutaj najważniejsze:
 * `data-controller='search'` - dzięki temu informujemy jaki kontroler obsługuje to pole
 * placeholder - tekst który jest wyświetlany gdy nie ma niczego wprowadzonego
-* 'input->search#search' - metoda search w naszym nowym kontrolerze będzie obsługiwać to pole
-* target - pod kluczem `params` w kontrolerze będą dostępne dane z pola input
+* 'input->search#connect' - metoda connect w naszym nowym kontrolerze JS będzie obsługiwać to pole
+* search_target - pod kluczem `params` w kontrolerze będą dostępne dane z pola input
 
 7. Dodatkowo pod nowo dodanym div'em dodajemy miejsce na wyniki wyszukiwania
 `<div class="row" id="search_results"></div>`
@@ -148,24 +149,17 @@ A także przyda nam się opakowanie całego bloku turbo_frame_tag w div `<div id
 static targets = ["params"]
 ```
 
-11. Zmieniamy nazwę metody connect na search i w niej odczytujemy wartość z pola input za pmocą:
+11. W metodzie `connect` odczytujemy wartość z pola input za pmocą:
 ```
 const value = this.paramsTarget.value
 ```
 
-12. Następnie tę wartość chcemy użyć do zapytania, aby pobrać dane z 'backendu' Rails, w naszym przypadku controllera books_controller.rb:
+12. Aby sprawdzić czy wartość jest przez kontroler odczytywana dodajemy logowanie do konsoli JS przeglądarki:
 ```
-fetch(`/books/search?search=${value}`, {
-  headers: {
-    "Content-Type": "application/json",
-  }
-})
-.then((response) => response.text())
-.then(res => {
-})
+console.log(value)
 ```
 
-13. Sprawdzamy czy działa i .... nie działa a w konsoli serwera widzimy blędy. Czegoś nam brakuje.
+13. Testujemy czy po wpisaniu w pole wyszukiwania coś się pojawia w konsoli JS przeglądarki, jeśli nic lub błąd - wzywamy mentora :)
 14. Mamy zmiany na widoku, mamy kontroler js wysyłający zapytania, ale nie mamy 'backendu', który by to zapytanie mógł obsłużyć.
 15. W `config/routes.rb` brakuje nam routingu obsługującego path: `/books/search` (metoda GET), dodajmy ją.
 16. W w `app/controllers/books_controller.rb` brakuje nam metody `search`, dodajmy ją też:
@@ -179,14 +173,26 @@ end
 # używamy tutaj renderowania tego samego partiala co wcześniej już używaliiśmy.
 ```
 
-17. Restart serwera - bo doszedł nowy routing, sprawdzamy ... i błędów nie ma w logach servera rails, ale nadal nie działa, nic sie nie dzieje.
-18. Zapytanie przechodzi ale nic z nim nie robimy, bo tutaj nie ma żadnej akcji w pliku kontrolera `app/javascript/controllers/search_controller.js`:
+17. Restart serwera - bo doszedł nowy routing, sprawdzamy wyszukiwarkę .... nie działa. Czegoś nam brakuje.
+18.  Wartość ze zmiennej 'value' chcemy użyć do zapytania, aby pobrać dane z 'backendu' Rails, w naszym przypadku controllera books_controller.rb:
+```
+fetch(`/books/search?search=${value}`, {
+  headers: {
+    "Content-Type": "application/json",
+  }
+})
+.then((response) => response.text())
+.then(res => {
+})
+```
+19. Zwróćcie uwagę na znaki jakie używam w miejscu gdzie przekazujemy wartość do parametru search. Musi to być znak "`", aby interpolacja zadziałała.
+20. Zapytanie przechodzi ale nic z nim nie robimy, bo tutaj nie ma żadnej akcji w pliku kontrolera `app/javascript/controllers/search_controller.js`:
 ```
     .then(res => {
     })
 ```
 
-19. Zmodyfikujmy w następujący sposób:
+21. Zmodyfikujmy w następujący sposób:
 ```
     .then(res => {
       const infinityScroll = document.getElementById("infinity_scroll")
@@ -198,4 +204,5 @@ end
     })
 ```
 W piewszej części wyłączamy infinityScroll jeśli używamy wyszukiwarki, w drugiej czyścimy dane w placeholerze na wyniki i aplikujemy wyniki pobrane z backendu.
-20. Sprawdzamy czy działa :)
+
+22. Sprawdzamy czy działa :)
