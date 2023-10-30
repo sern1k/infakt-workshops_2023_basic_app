@@ -174,7 +174,7 @@ end
 ```
 
 17. Restart serwera - bo doszedł nowy routing, sprawdzamy wyszukiwarkę .... nie działa. Czegoś nam brakuje.
-18.  Wartość ze zmiennej 'value' chcemy użyć do zapytania, aby pobrać dane z 'backendu' Rails, w naszym przypadku controllera books_controller.rb:
+18.  Wartość ze zmiennej 'value' chcemy użyć do zapytania, aby pobrać dane z 'backendu' Rails:
 ```
 fetch(`/books/search?search=${value}`, {
   headers: {
