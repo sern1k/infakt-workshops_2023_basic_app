@@ -13,7 +13,8 @@
                 "Cancel",
                 cancel_book_loan_path(book_loan),
                 method: :post,
-                class: "btn btn-danger cancel-btn"
+                class: "btn btn-danger cancel-btn",
+                data: { turbo_frame: '_top' }
               ) unless book_loan.cancelled? %>
         </li>
       <% end %>
@@ -33,7 +34,8 @@
                 "Cancel",
                 cancel_book_reservation_path(book_reservation),
                 method: :post,
-                class: "btn btn-danger cancel-btn"
+                class: "btn btn-danger cancel-btn",
+                data: { turbo_frame: '_top' }
               ) unless book_reservation.cancelled? %>
         </li>
       <% end %>

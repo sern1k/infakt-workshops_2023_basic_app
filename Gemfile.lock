@@ -180,6 +180,18 @@ GEM
       activesupport (>= 5.0.0)
     json (2.6.3)
     jwt (2.7.1)
+    kaminari (1.2.2)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.2)
+      kaminari-activerecord (= 1.2.2)
+      kaminari-core (= 1.2.2)
+    kaminari-actionview (1.2.2)
+      actionview
+      kaminari-core (= 1.2.2)
+    kaminari-activerecord (1.2.2)
+      activerecord
+      kaminari-core (= 1.2.2)
+    kaminari-core (1.2.2)
     language_server-protocol (3.17.0.3)
     launchy (2.5.2)
       addressable (~> 2.8)
@@ -464,6 +476,7 @@ DEPENDENCIES
   hotwire-rails
   importmap-rails
   jbuilder
+  kaminari
   letter_opener
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
