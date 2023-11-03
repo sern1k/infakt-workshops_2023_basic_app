@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    a9n (1.5.0)
     actioncable (7.0.8)
       actionpack (= 7.0.8)
       activesupport (= 7.0.8)
@@ -338,6 +339,7 @@ PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
+  a9n
   bootsnap
   bootstrap
   capybara
