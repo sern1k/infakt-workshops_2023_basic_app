@@ -474,6 +474,7 @@ DEPENDENCIES
   faker
   google-api-client
   hotwire-rails
+  i18n
   importmap-rails
   jbuilder
   kaminari

@@ -42,3 +42,7 @@ en:
         notice: 'Book Loan was successfully created.'
       cancel:
         notice: 'Book loan was successfully cancelled.'
+  weather_presenter:
+    encourage_text:
+      good_to_read_outside: "Get some snacks and go read a book in a park!"
+      not_good_to_read_outside: "It's always a good weather to read a book!"

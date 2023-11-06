@@ -11,7 +11,7 @@ describe 'Log in', type: :feature do
     let(:email) { 'not_existing@email.com' }
     let(:password) { 'password' }
 
-    it 'displays error message' do # wszystkie capybarowe akcje wykonujemy w bloku it
+    it 'displays error message' do
       within '#new_user' do
         fill_in 'user_email',	with: email
         fill_in 'user_password',	with: password
