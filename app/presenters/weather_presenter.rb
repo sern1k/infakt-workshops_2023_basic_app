@@ -1,18 +1,24 @@
 class WeatherPresenter
+  THRESHOLD_FOR_READING_OUTSIDE = 15
+
   def initialize(data)
     @data = data
   end
 
+  def current_data
+    data['current']
+  end
+
   def description
-    data['current']['condition']['text']
+    current_data['condition']['text']
   end
 
   def temperature
-    data['current']['temp_c']
+    current_data['temp_c']
   end
 
   def icon
-    data['current']['condition']['icon']
+    current_data['condition']['icon']
   end
 
   def location
@@ -24,14 +30,14 @@ class WeatherPresenter
   end
 
   def good_to_read_outside?
-    nice_weather? && @temperature > 15
+    nice_weather? && @temperature > THRESHOLD_FOR_READING_OUTSIDE
   end
 
   def encourage_text
     if good_to_read_outside?
-      "Get some snacks and go read a book in a park!"
+      I18n.t('weather_presenter.encourage_text.good_to_read_outside')
     else
-      "It's always a good weather to read a book!"
+      I18n.t('weather_presenter.encourage_text.not_good_to_read_outside')
     end
   end
 
